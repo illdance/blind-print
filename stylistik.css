@@ -1,0 +1,52 @@
+body {
+    background-color:#ffffff;
+    margin:0px
+}
+
+.logo {
+    background-color: #498AD2;
+    display: flex;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    color:aliceblue;
+    text-align: center;
+    flex-direction: column;
+}
+
+.logo-text {
+    font-size: 48px;
+    margin: 24px 0px;
+}
+
+.pod-logo-text {
+    background-color: #004E89;
+    color: #ffffff;
+    padding: 12px 0px;
+    margin: 0px;
+}
+
+.beginning {
+    background-color: #FFFFFF;
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+}
+
+.btn {
+    margin: 90px;
+    border-radius: 30px;
+    border: none;
+    color:aliceblue;
+}
+
+.start {
+    background-color:#004E89;
+    font-size: 40px;
+    padding: 20px;
+}
+
+.other {
+    background-color: #D7D7D7;
+    font-size: 20px;
+    padding: 10px
+}
