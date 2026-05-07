@@ -1,20 +1,1202 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <link rel="stylesheet" href="stylistik.css">
-    <title>Blind-print</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div class = "logo">
-      <p class = "logo-text">Тренажёр слепой печати</p>
-      <p class = "pod-logo-text">Опробуйте свои силы в слепой печати</p>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeFlow — Тренажёр слепой печати</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16213e;
+            --accent-1: #e94560;
+            --accent-2: #0f3460;
+            --accent-3: #533483;
+            --accent-4: #e94560;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b8;
+            --text-dim: #4a4a6a;
+            --correct: #00e676;
+            --incorrect: #ff1744;
+            --current: #ffab00;
+            --gradient-1: linear-gradient(135deg, #e94560, #533483);
+            --gradient-2: linear-gradient(135deg, #0f3460, #533483);
+            --gradient-3: linear-gradient(135deg, #e94560, #ff6b6b);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(233, 69, 96, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(83, 52, 131, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(15, 52, 96, 0.08) 0%, transparent 50%);
+            animation: bgMove 20s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-2%, 1%); }
+            50% { transform: translate(1%, -2%); }
+            75% { transform: translate(-1%, 2%); }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.3);
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 900;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .header-stat {
+            text-align: center;
+        }
+
+        .header-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent-4);
+        }
+
+        .header-stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .text-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .text-btn {
+            padding: 10px 20px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .text-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .text-btn:hover {
+            border-color: rgba(233, 69, 96, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .text-btn.active {
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.3);
+        }
+
+        .text-btn.active::before {
+            opacity: 1;
+        }
+
+        .text-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-restart {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn-keyboard {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 2px solid rgba(255,255,255,0.05);
+        }
+
+        .btn-keyboard:hover {
+            border-color: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        .btn-keyboard.active {
+            background: var(--gradient-2);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.04);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(233, 69, 96, 0.2);
+        }
+
+        .stat-card:hover::after {
+            opacity: 1;
+        }
+
+        .stat-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 32px;
+            font-weight: 800;
+            background: var(--gradient-3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
+        }
+
+        /* Typing Area */
+        .typing-area {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.04);
+            position: relative;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+        }
+
+        .text-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            line-height: 2;
+            letter-spacing: 0.5px;
+            min-height: 120px;
+            user-select: none;
+            position: relative;
+        }
+
+        .char {
+            position: relative;
+            transition: color 0.1s ease;
+            border-radius: 3px;
+            padding: 2px 0;
+        }
+
+        .char.correct {
+            color: var(--correct);
+        }
+
+        .char.incorrect {
+            color: var(--incorrect);
+            background: rgba(255, 23, 68, 0.15);
+            border-radius: 4px;
+        }
+
+        .char.current {
+            color: var(--text-primary);
+            background: rgba(255, 171, 0, 0.2);
+            border-radius: 4px;
+            animation: cursorBlink 1s ease-in-out infinite;
+        }
+
+        .char.current::after {
+            content: '';
+            position: absolute;
+            left: -1px;
+            top: 2px;
+            bottom: 2px;
+            width: 2px;
+            background: var(--current);
+            animation: blink 1s ease-in-out infinite;
+            border-radius: 2px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        @keyframes cursorBlink {
+            0%, 50% { background: rgba(255, 171, 0, 0.2); }
+            51%, 100% { background: rgba(255, 171, 0, 0.1); }
+        }
+
+        .char.pending {
+            color: var(--text-dim);
+        }
+
+        .hidden-input {
+            position: absolute;
+            opacity: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: default;
+        }
+
+        .click-hint {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 16px;
+            opacity: 0.6;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 24px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            height: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-1);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* Virtual Keyboard */
+        .keyboard-section {
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .keyboard-section.visible {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .keyboard {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .keyboard-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .key {
+            min-width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 600;
+            background: rgba(255,255,255,0.04);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: all 0.15s ease;
+            position: relative;
+        }
+
+        .key.active-key {
+            background: var(--gradient-1);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+            transform: scale(1.1);
+        }
+
+        .key.pressed {
+            transform: scale(0.92);
+            background: rgba(233, 69, 96, 0.3);
+            border-color: rgba(233, 69, 96, 0.5);
+        }
+
+        .key.space {
+            min-width: 320px;
+        }
+
+        .key.finger-l-pinky { border-bottom: 2px solid #e94560; }
+        .key.finger-l-ring { border-bottom: 2px solid #ff6b6b; }
+        .key.finger-l-middle { border-bottom: 2px solid #ffab00; }
+        .key.finger-l-index { border-bottom: 2px solid #00e676; }
+        .key.finger-r-index { border-bottom: 2px solid #00e676; }
+        .key.finger-r-middle { border-bottom: 2px solid #ffab00; }
+        .key.finger-r-ring { border-bottom: 2px solid #ff6b6b; }
+        .key.finger-r-pinky { border-bottom: 2px solid #e94560; }
+        .key.finger-thumb { border-bottom: 2px solid #533483; }
+
+        /* Results Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: modalSlide 0.4s ease;
+        }
+
+        @keyframes modalSlide {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-emoji {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .modal-stat {
+            background: rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .modal-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--accent-4);
+        }
+
+        .modal-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        .modal-btn {
+            padding: 14px 40px;
+            border: none;
+            border-radius: 14px;
+            background: var(--gradient-1);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.3);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(233, 69, 96, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+
+        footer a {
+            color: var(--accent-4);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .typing-area {
+                padding: 24px;
+            }
+            .text-display {
+                font-size: 18px;
+            }
+            .key {
+                min-width: 30px;
+                height: 40px;
+                font-size: 11px;
+            }
+            .key.space {
+                min-width: 150px;
+            }
+            .header-stats {
+                display: none;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        /* Particles */
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: particleFloat 1s ease-out forwards;
+            z-index: 50;
+        }
+
+        @keyframes particleFloat {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(0); }
+        }
+
+        /* Streak indicator */
+        .streak-indicator {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: var(--gradient-1);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .streak-indicator.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Combo animation */
+        @keyframes comboPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .combo-pulse {
+            animation: comboPulse 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">⌨️</div>
+            <div class="logo-text">TypeFlow</div>
+        </div>
+        <div class="header-stats">
+            <div class="header-stat">
+                <div class="header-stat-value" id="bestWPM">0</div>
+                <div class="header-stat-label">Рекорд WPM</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-value" id="totalTests">0</div>
+                <div class="header-stat-label">Тестов</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Controls -->
+    <div class="controls">
+        <div class="text-selector">
+            <button class="text-btn active" data-category="all" onclick="selectCategory('all')"><span>🎲 Все</span></button>
+            <button class="text-btn" data-category="simple" onclick="selectCategory('simple')"><span>📝 Простые</span></button>
+            <button class="text-btn" data-category="quotes" onclick="selectCategory('quotes')"><span>💬 Цитаты</span></button>
+            <button class="text-btn" data-category="code" onclick="selectCategory('code')"><span>💻 Код</span></button>
+            <button class="text-btn" data-category="hard" onclick="selectCategory('hard')"><span>🔥 Сложные</span></button>
+        </div>
+        <div class="action-buttons">
+            <button class="action-btn btn-keyboard" id="kbToggle" onclick="toggleKeyboard()">⌨️ Клавиатура</button>
+            <button class="action-btn btn-restart" onclick="restartTest()">🔄 Заново</button>
+        </div>
     </div>
-    <div class = "beginning">
-      <button class = "start btn">Начать</button>
-      <button class = "other btn">Прочее</button>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+        <div class="stat-card">
+            <div class="stat-icon">⚡</div>
+            <div class="stat-value" id="wpm">0</div>
+            <div class="stat-label">Симв/мин</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-value" id="accuracy">100</div>
+            <div class="stat-label">Точность %</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-value" id="timer">0</div>
+            <div class="stat-label">Секунды</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🔥</div>
+            <div class="stat-value" id="streak">0</div>
+            <div class="stat-label">Серия</div>
+        </div>
     </div>
-  </body>
+
+    <!-- Typing Area -->
+    <div class="typing-area" id="typingArea" onclick="focusInput()">
+        <div class="streak-indicator" id="streakIndicator">🔥 Серия!</div>
+        <div class="text-display" id="textDisplay"></div>
+        <input type="text" class="hidden-input" id="hiddenInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div class="click-hint" id="clickHint">Нажмите сюда или начните печатать</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- Virtual Keyboard -->
+    <div class="keyboard-section" id="keyboardSection">
+        <div class="keyboard" id="keyboard"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>TypeFlow — Тренажёр слепой печати • Нажми <strong>Tab + Enter</strong> для перезапуска</p>
+    </footer>
+</div>
+
+<!-- Results Modal -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-emoji" id="modalEmoji">🏆</div>
+        <div class="modal-title" id="modalTitle">Отлично!</div>
+        <div class="modal-subtitle" id="modalSubtitle">Вы завершили тест</div>
+        <div class="modal-stats">
+            <div class="modal-stat">
+                <div class="modal-stat-value" id="modalWPM">0</div>
+                <div class="modal-stat-label">Симв/мин</div>
+            </div>
+            <div class="modal-stat">
+                <div class="modal-stat-value" id="modalAccuracy">0%</div>
+                <div class="modal-stat-label">Точность</div>
+            </div>
+            <div class="modal-stat">
+                <div class="modal-stat-value" id="modalTime">0с</div>
+                <div class="modal-stat-label">Время</div>
+            </div>
+            <div class="modal-stat">
+                <div class="modal-stat-value" id="modalBestStreak">0</div>
+                <div class="modal-stat-label">Макс. серия</div>
+            </div>
+        </div>
+        <button class="modal-btn" onclick="closeModal()">🔄 Ещё раз</button>
+    </div>
+</div>
+
+<script>
+    // ==================== TEXTS ====================
+    const texts = {
+        simple: [
+            "Мама мыла раму. Рома мыл пол. Папа читал газету.",
+            "Кот сидел на окне и смотрел на птиц. Птицы пели песни.",
+            "Солнце светит ярко. Небо голубое. Трава зелёная и свежая.",
+            "Дети играли в парке. Они бегали и смеялись весь день.",
+            "Чай горячий и вкусный. Кофе крепкий и ароматный.",
+            "Зима пришла рано. Снег покрыл землю белым ковром.",
+            "Рыба плавает в реке. Утка плывёт по озеру тихо.",
+            "Книга лежит на столе. Страницы жёлтые от времени.",
+            "Дом стоит на холме. Вокруг растут высокие сосны.",
+            "Мяч упал в траву. Собака быстро его нашла."
+        ],
+        quotes: [
+            "Единственный способ делать великую работу — любить то, что вы делаете.",
+            "Будьте собой, прочие роли уже заняты кем-то другим.",
+            "Жизнь — это то, что случается с вами, пока вы строите другие планы.",
+            "В середине трудности кроется возможность, которая ждёт своего часа.",
+            "Знание — это сила, но энтузиазм — это то, что двигает мир.",
+            "Не бойся идти медленно, бойся стоять на месте без движения.",
+            "Успех — это не конец, неудача — не конец, важна лишь смелость.",
+            "Каждый день — это новая возможность изменить свою жизнь к лучшему.",
+            "Мудрость начинается с удивления и заканчивается пониманием себя.",
+            "Свобода — это то, что вы делаете с тем, что с вами сделали."
+        ],
+        code: [
+            "const app = express(); app.listen(3000, () => console.log('Server running'));",
+            "function fibonacci(n) { return n <= 1 ? n : fibonacci(n-1) + fibonacci(n-2); }",
+            "for (let i = 0; i < array.length; i++) { sum += array[i]; }",
+            "document.querySelector('.btn').addEventListener('click', handleClick);",
+            "const data = await fetch('/api/users').then(res => res.json());",
+            "class User { constructor(name) { this.name = name; } greet() { return `Hi ${this.name}`; } }",
+            "if (error !== null && error !== undefined) { throw new Error('Something went wrong'); }",
+            "array.filter(x => x > 0).map(x => x * 2).reduce((a, b) => a + b, 0);",
+            "import React, { useState, useEffect } from 'react';",
+            "SELECT * FROM users WHERE age > 18 ORDER BY name ASC LIMIT 10;"
+        ],
+        hard: [
+            "Экскурсовод продемонстрировал экскурсантам экспонаты из коллекции императорского Эрмитажа.",
+            "В недрах тундры выдры в гетрах тырят в вёдра ядра кедров с хитрой ужимкой.",
+            "Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства.",
+            "Программирование — это искусство создания элегантных решений для сложных проблем.",
+            "Философия экзистенциализма подчёркивает индивидуальную свободу и ответственность.",
+            "Экзистенциализм Сартра утверждает: существование предшествует сущности человека.",
+            "Парадигма функционального программирования основана на вычислении математических функций.",
+            "Экстраординарные достижения требуют экстраординарных усилий и дисциплины.",
+            "Интернационализация и локализация — ключевые этапы разработки глобального ПО.",
+            "Энциклопедический кругозор способствует формированию критического мышления."
+        ]
+    };
+
+    // ==================== STATE ====================
+    let currentText = '';
+    let currentIndex = 0;
+    let correctChars = 0;
+    let totalChars = 0;
+    let startTime = null;
+    let timerInterval = null;
+    let currentStreak = 0;
+    let bestStreak = 0;
+    let isFinished = false;
+    let currentCategory = 'all';
+    let keyboardVisible = false;
+    let bestWPM = parseInt(localStorage.getItem('bestWPM') || '0');
+    let totalTests = parseInt(localStorage.getItem('totalTests') || '0');
+    let keyElements = {};
+
+    // ==================== INIT ====================
+    function init() {
+        document.getElementById('bestWPM').textContent = bestWPM;
+        document.getElementById('totalTests').textContent = totalTests;
+        buildKeyboard();
+        loadNewText();
+        setupEventListeners();
+    }
+
+    function loadNewText() {
+        let pool;
+        if (currentCategory === 'all') {
+            pool = [...texts.simple, ...texts.quotes, ...texts.code, ...texts.hard];
+        } else {
+            pool = [...texts[currentCategory]];
+        }
+        currentText = pool[Math.floor(Math.random() * pool.length)];
+        currentIndex = 0;
+        correctChars = 0;
+        totalChars = 0;
+        currentStreak = 0;
+        bestStreak = 0;
+        isFinished = false;
+        startTime = null;
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = null;
+
+        updateDisplay();
+        updateStats();
+        document.getElementById('progressBar').style.width = '0%';
+        document.getElementById('streak').textContent = '0';
+        document.getElementById('streakIndicator').classList.remove('visible');
+        focusInput();
+    }
+
+    function selectCategory(cat) {
+        currentCategory = cat;
+        document.querySelectorAll('.text-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.category === cat);
+        });
+        loadNewText();
+    }
+
+    // ==================== DISPLAY ====================
+    function updateDisplay() {
+        const display = document.getElementById('textDisplay');
+        let html = '';
+        for (let i = 0; i < currentText.length; i++) {
+            let cls = 'char pending';
+            if (i < currentIndex) {
+                cls = 'char correct';
+            } else if (i === currentIndex) {
+                cls = 'char current';
+            }
+            const ch = currentText[i] === ' ' ? '&nbsp;' : escapeHtml(currentText[i]);
+            html += `<span class="${cls}" id="char-${i}">${ch}</span>`;
+        }
+        display.innerHTML = html;
+        highlightKeyboardKey(currentText[currentIndex]);
+    }
+
+    function updateCharState(index, state) {
+        const el = document.getElementById(`char-${index}`);
+        if (!el) return;
+        el.className = `char ${state}`;
+    }
+
+    function escapeHtml(ch) {
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+        return map[ch] || ch;
+    }
+
+    // ==================== STATS ====================
+    function updateStats() {
+        const elapsed = startTime ? (Date.now() - startTime) / 1000 : 0;
+        const wpm = elapsed > 0 ? Math.round((correctChars / elapsed) * 60) : 0;
+        const accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+
+        document.getElementById('wpm').textContent = wpm;
+        document.getElementById('accuracy').textContent = accuracy;
+        document.getElementById('timer').textContent = Math.floor(elapsed);
+        document.getElementById('streak').textContent = currentStreak;
+
+        // Progress
+        const progress = (currentIndex / currentText.length) * 100;
+        document.getElementById('progressBar').style.width = progress + '%';
+
+        // Streak indicator
+        const streakEl = document.getElementById('streakIndicator');
+        if (currentStreak >= 10) {
+            streakEl.textContent = `🔥 ${currentStreak} без ошибок!`;
+            streakEl.classList.add('visible');
+        } else {
+            streakEl.classList.remove('visible');
+        }
+    }
+
+    // ==================== TYPING ====================
+    function handleKeyPress(e) {
+        if (isFinished) return;
+
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            restartTest();
+            return;
+        }
+
+        if (e.key.length > 1 && e.key !== ' ') return;
+
+        e.preventDefault();
+
+        if (!startTime) {
+            startTime = Date.now();
+            timerInterval = setInterval(updateStats, 200);
+        }
+
+        const expected = currentText[currentIndex];
+        totalChars++;
+
+        if (e.key === expected) {
+            updateCharState(currentIndex, 'correct');
+            correctChars++;
+            currentStreak++;
+            if (currentStreak > bestStreak) bestStreak = currentStreak;
+            createParticle(currentIndex);
+        } else {
+            updateCharState(currentIndex, 'incorrect');
+            currentStreak = 0;
+        }
+
+        // Animate key on keyboard
+        animateKey(e.key);
+
+        currentIndex++;
+
+        if (currentIndex >= currentText.length) {
+            finishTest();
+            return;
+        }
+
+        updateCharState(currentIndex, 'current');
+        updateStats();
+        highlightKeyboardKey(currentText[currentIndex]);
+
+        // Auto-scroll text display
+        const currentCharEl = document.getElementById(`char-${currentIndex}`);
+        if (currentCharEl) {
+            currentCharEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    function finishTest() {
+        isFinished = true;
+        clearInterval(timerInterval);
+
+        const elapsed = (Date.now() - startTime) / 1000;
+        const wpm = Math.round((correctChars / elapsed) * 60);
+        const accuracy = Math.round((correctChars / totalChars) * 100);
+
+        // Update best
+        if (wpm > bestWPM) {
+            bestWPM = wpm;
+            localStorage.setItem('bestWPM', bestWPM.toString());
+            document.getElementById('bestWPM').textContent = bestWPM;
+        }
+
+        totalTests++;
+        localStorage.setItem('totalTests', totalTests.toString());
+        document.getElementById('totalTests').textContent = totalTests;
+
+        // Show modal
+        const emoji = accuracy >= 95 && wpm >= 200 ? '🏆' :
+                      accuracy >= 90 && wpm >= 150 ? '🌟' :
+                      accuracy >= 80 ? '👏' : '💪';
+        const title = accuracy >= 95 && wpm >= 200 ? 'Невероятно!' :
+                      accuracy >= 90 ? 'Отлично!' :
+                      accuracy >= 80 ? 'Хорошо!' : 'Продолжай练习!';
+
+        document.getElementById('modalEmoji').textContent = emoji;
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalSubtitle').textContent = `Текст: "${currentText.substring(0, 40)}..."`;
+        document.getElementById('modalWPM').textContent = wpm;
+        document.getElementById('modalAccuracy').textContent = accuracy + '%';
+        document.getElementById('modalTime').textContent = Math.floor(elapsed) + 'с';
+        document.getElementById('modalBestStreak').textContent = bestStreak;
+
+        document.getElementById('modalOverlay').classList.add('visible');
+    }
+
+    function restartTest() {
+        document.getElementById('modalOverlay').classList.remove('visible');
+        loadNewText();
+    }
+
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('visible');
+        loadNewText();
+    }
+
+    // ==================== KEYBOARD ====================
+    const keyboardLayout = [
+        ['ё', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='],
+        ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ'],
+        ['ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э'],
+        ['я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю'],
+        ['shift', '.', ',', '!', '?', ':', ';', '(', ')', 'shift'],
+        ['space']
+    ];
+
+    const fingerMap = {
+        'ё': 'l-pinky', '1': 'l-pinky', '2': 'l-ring', '3': 'l-middle', '4': 'l-index', '5': 'l-index',
+        '6': 'r-index', '7': 'r-index', '8': 'r-middle', '9': 'r-ring', '0': 'r-pinky', '-': 'r-pinky', '=': 'r-pinky',
+        'й': 'l-pinky', 'ц': 'l-ring', 'у': 'l-middle', 'к': 'l-index', 'е': 'l-index',
+        'н': 'r-index', 'г': 'r-index', 'ш': 'r-middle', 'щ': 'r-ring', 'з': 'r-pinky', 'х': 'r-pinky', 'ъ': 'r-pinky',
+        'ф': 'l-pinky', 'ы': 'l-ring', 'в': 'l-middle', 'а': 'l-index', 'п': 'l-index',
+        'р': 'r-index', 'о': 'r-index', 'л': 'r-middle', 'д': 'r-ring', 'ж': 'r-pinky', 'э': 'r-pinky',
+        'я': 'l-pinky', 'ч': 'l-ring', 'с': 'l-middle', 'м': 'l-index', 'и': 'l-index',
+        'т': 'r-index', 'ь': 'r-index', 'б': 'r-middle', 'ю': 'r-ring',
+        'shift': 'thumb', '.': 'r-index', ',': 'r-index', '!': 'r-middle', '?': 'r-ring', ':': 'r-pinky', ';': 'r-pinky', '(': 'l-pinky', ')': 'r-pinky',
+        'space': 'thumb'
+    };
+
+    function buildKeyboard() {
+        const kb = document.getElementById('keyboard');
+        let html = '';
+
+        keyboardLayout.forEach(row => {
+            html += '<div class="keyboard-row">';
+            row.forEach(key => {
+                const finger = fingerMap[key] || '';
+                const isSpace = key === 'space';
+                const isShift = key === 'shift';
+                const display = isSpace ? 'пробел' : isShift ? '⇧' : key;
+                const cls = isSpace ? 'key space' : `key`;
+                html += `<div class="${cls} finger-${finger}" data-key="${key}">${display}</div>`;
+            });
+            html += '</div>';
+        });
+
+        kb.innerHTML = html;
+
+        // Cache key elements
+        kb.querySelectorAll('.key').forEach(el => {
+            keyElements[el.dataset.key] = el;
+        });
+    }
+
+    function highlightKeyboardKey(char) {
+        // Remove all highlights
+        Object.values(keyElements).forEach(el => el.classList.remove('active-key'));
+
+        if (!char) return;
+
+        const lower = char.toLowerCase();
+        let targetKey = null;
+
+        // Map common keys
+        if (lower === ' ') targetKey = 'space';
+        else if (keyElements[lower]) targetKey = lower;
+        else if (keyElements[char]) targetKey = char;
+
+        if (targetKey && keyElements[targetKey]) {
+            keyElements[targetKey].classList.add('active-key');
+        }
+    }
+
+    function animateKey(key) {
+        const lower = key.toLowerCase();
+        let targetKey = null;
+
+        if (lower === ' ') targetKey = 'space';
+        else if (keyElements[lower]) targetKey = lower;
+        else if (keyElements[key]) targetKey = key;
+
+        if (targetKey && keyElements[targetKey]) {
+            keyElements[targetKey].classList.add('pressed');
+            setTimeout(() => keyElements[targetKey].classList.remove('pressed'), 150);
+        }
+    }
+
+    function toggleKeyboard() {
+        keyboardVisible = !keyboardVisible;
+        document.getElementById('keyboardSection').classList.toggle('visible', keyboardVisible);
+        document.getElementById('kbToggle').classList.toggle('active', keyboardVisible);
+    }
+
+    // ==================== PARTICLES ====================
+    function createParticle(charIndex) {
+        const charEl = document.getElementById(`char-${charIndex}`);
+        if (!charEl) return;
+
+        const rect = charEl.getBoundingClientRect();
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = rect.left + rect.width / 2 + 'px';
+        particle.style.top = rect.top + 'px';
+        particle.style.width = '6px';
+        particle.style.height = '6px';
+        particle.style.background = `hsl(${Math.random() * 60 + 120}, 100%, 60%)`;
+
+        document.body.appendChild(particle);
+        setTimeout(() => particle.remove(), 1000);
+    }
+
+    // ==================== EVENTS ====================
+    function setupEventListeners() {
+        const input = document.getElementById('hiddenInput');
+        input.addEventListener('keydown', handleKeyPress);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                restartTest();
+            }
+            focusInput();
+        });
+
+        // Handle modal close
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+    }
+
+    function focusInput() {
+        document.getElementById('hiddenInput').focus();
+        document.getElementById('clickHint').style.opacity = '0';
+    }
+
+    // ==================== START ====================
+    init();
+</script>
+
+</body>
 </html>
